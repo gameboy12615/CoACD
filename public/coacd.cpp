@@ -199,6 +199,41 @@ CoACD_MeshArray CoACD_run(CoACD_Mesh const &input, double threshold,
   return arr;
 }
 
+double CoACD_CalculateConcavity(CoACD_Mesh const& input, int sample_resolution, int apx_mode, unsigned int seed)
+{
+	coacd::Mesh mesh;
+	for (uint64_t i = 0; i < input.vertices_count; ++i) {
+		mesh.vertices.push_back({ input.vertices_ptr[3 * i],
+								 input.vertices_ptr[3 * i + 1],
+								 input.vertices_ptr[3 * i + 2] });
+	}
+	for (uint64_t i = 0; i < input.triangles_count; ++i) {
+		mesh.indices.push_back({ input.triangles_ptr[3 * i],
+								input.triangles_ptr[3 * i + 1],
+								input.triangles_ptr[3 * i + 2] });
+	}
+
+    std::string apx;
+	if (apx_mode == apx_ch) {
+		apx = "ch";
+	}
+	else if (apx_mode == apx_box) {
+		apx = "box";
+	}
+	else {
+		throw std::runtime_error("invalid approximation mode " + std::to_string(apx_mode));
+	}
+
+    coacd::Model m;
+	m.Load(mesh.vertices, mesh.indices);
+
+    coacd::Model pCH;
+	m.ComputeAPX(pCH, apx, true);
+	double h = ComputeRv(m, pCH, 0.3, 0.0001);
+
+    return h;
+}
+
 void CoACD_setLogLevel(char const *level) {
   coacd::set_log_level(std::string_view(level));
 }

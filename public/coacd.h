@@ -59,5 +59,8 @@ CoACD_MeshArray COACD_API CoACD_run(CoACD_Mesh const &input, double threshold,
                                     bool extrude, double extrude_margin,
                                     int apx_mode, unsigned int seed);
 
+double COACD_API CoACD_CalculateConcavity(
+    CoACD_Mesh const& input, int sample_resolution, int apx_mode, unsigned int seed);
+
 void COACD_API CoACD_setLogLevel(char const *level);
 }
